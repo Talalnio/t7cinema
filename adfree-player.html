@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>مشاهدة بدون إعلانات</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #000;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+
+  <script>
+    // ✅ منع النوافذ المنبثقة
+    window.open = () => null;
+    Object.defineProperty(window, 'open', { value: () => null });
+
+    // ✅ تعطيل السكربتات الإعلانية
+    const blockAds = () => {
+      const badWords = ["ads", "pop", "banner", "click", "tracker"];
+      document.querySelectorAll("script, iframe, div").forEach(el => {
+        const src = el.src || el.innerHTML || "";
+        if (badWords.some(word => src.toLowerCase().includes(word))) {
+          el.remove();
+        }
+      });
+    };
+
+    // ✅ مراقبة DOM للحذف التلقائي
+    const observer = new MutationObserver(blockAds);
+    observer.observe(document, { childList: true, subtree: true });
+
+    // ✅ إيقاف أي onclick منبثق
+    document.addEventListener("click", e => {
+      e.stopImmediatePropagation();
+    }, true);
+  </script>
+</head>
+<body>
+  <iframe id="player" allowfullscreen allow="autoplay"></iframe>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const videoURL = urlParams.get("url");
+    if (videoURL) {
+      document.getElementById("player").src = decodeURIComponent(videoURL);
+    } else {
+      document.body.innerHTML = "<h2 style='color: white; text-align: center; margin-top: 20%;'>❌ لا يوجد رابط فيديو!</h2>";
+    }
+  </script>
+</body>
+</html>
