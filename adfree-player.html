@@ -1,59 +1,65 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>مشاهدة بدون إعلانات</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chillax Player</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      height: 100%;
       background-color: #000;
+      height: 100%;
+      overflow: hidden;
     }
     iframe {
-      width: 100%;
-      height: 100%;
       border: none;
+      width: 100vw;
+      height: 100vh;
+    }
+    .loading-screen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(#1f0037, #000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      flex-direction: column;
+      color: white;
+      font-family: sans-serif;
+      animation: fadeOut 1s ease-in-out 1 forwards;
+      animation-delay: 2s;
+    }
+    .loading-screen h1 {
+      font-size: 1.5rem;
+      margin-top: 1rem;
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
     }
   </style>
-
   <script>
-    // ✅ منع النوافذ المنبثقة
+    // منع كل الإعلانات المنبثقة تماماً
     window.open = () => null;
-    Object.defineProperty(window, 'open', { value: () => null });
-
-    // ✅ تعطيل السكربتات الإعلانية
-    const blockAds = () => {
-      const badWords = ["ads", "pop", "banner", "click", "tracker"];
-      document.querySelectorAll("script, iframe, div").forEach(el => {
-        const src = el.src || el.innerHTML || "";
-        if (badWords.some(word => src.toLowerCase().includes(word))) {
-          el.remove();
-        }
-      });
-    };
-
-    // ✅ مراقبة DOM للحذف التلقائي
-    const observer = new MutationObserver(blockAds);
-    observer.observe(document, { childList: true, subtree: true });
-
-    // ✅ إيقاف أي onclick منبثق
-    document.addEventListener("click", e => {
-      e.stopImmediatePropagation();
-    }, true);
+    document.addEventListener('DOMContentLoaded', () => {
+      const query = new URLSearchParams(window.location.search);
+      const videoUrl = query.get('url');
+      if (!videoUrl) {
+        document.body.innerHTML = '<h1 style="color: white; text-align: center; margin-top: 50px;">❌ لا يوجد رابط تشغيل</h1>';
+        return;
+      }
+      const iframe = document.createElement('iframe');
+      iframe.src = videoUrl;
+      document.body.appendChild(iframe);
+    });
   </script>
 </head>
 <body>
-  <iframe id="player" allowfullscreen allow="autoplay"></iframe>
-
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const videoURL = urlParams.get("url");
-    if (videoURL) {
-      document.getElementById("player").src = decodeURIComponent(videoURL);
-    } else {
-      document.body.innerHTML = "<h2 style='color: white; text-align: center; margin-top: 20%;'>❌ لا يوجد رابط فيديو!</h2>";
-    }
-  </script>
+  <div class="loading-screen">
+    <img src="https://media.tenor.com/1jTLEtWYOBMAAAAC/loading-bar.gif" width="90" />
+    <h1>جارٍ تجهيز المشغل السينمائي...</h1>
+  </div>
 </body>
 </html>
