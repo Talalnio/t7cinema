@@ -1,64 +1,89 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>مشغل T7 السينمائي</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: radial-gradient(ellipse at center, #120012, #000);
-      font-family: 'Segoe UI', sans-serif;
-      color: white;
+      margin: 0;
+      background-color: #000;
+      color: #fff;
+      font-family: 'Cairo', sans-serif;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
-    #loader {
-      flex: 1;
-      display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
-      font-weight: bold;
-      animation: blink 1.5s infinite;
+      height: 100vh;
     }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+    #loader {
+      position: absolute;
+      font-size: 1.5rem;
+      color: #ccc;
+      text-align: center;
     }
-    #player {
-      display: none;
-      flex: 1;
+    iframe {
+      width: 100vw;
+      height: 100vh;
       border: none;
-      width: 100%;
-      height: 100%;
+    }
+    #controls {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+    }
+    #controls button {
+      background-color: #7456c8;
+      border: none;
+      color: white;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    input[type="file"] {
+      display: none;
     }
   </style>
 </head>
 <body>
   <div id="loader">...جارٍ تجهيز المشغل السينمائي</div>
-  <iframe id="player" allowfullscreen></iframe>
+
+  <div id="controls">
+    <button onclick="skipIntro()">⏭ تخطي المقدمة</button>
+    <button onclick="document.getElementById('subtitleInput').click()">📄 رفع ترجمة</button>
+    <input type="file" id="subtitleInput" accept=".srt" onchange="uploadSubtitle(event)">
+  </div>
+
+  <iframe id="vidoraPlayer"></iframe>
 
   <script>
-    // ✅ منع جميع الإعلانات المنبثقة
-    window.open = function () {};
-    document.addEventListener('click', function (e) {
-      if (e.target.tagName === 'A') e.preventDefault();
-    }, true);
+    // جلب رابط الفيديو من الباراميتر ?url=...
+    const params = new URLSearchParams(window.location.search);
+    const vidURL = params.get("url");
+    const player = document.getElementById("vidoraPlayer");
 
-    // ✅ منع أي نوافذ منبثقة داخل iframe
-    const iframe = document.getElementById('player');
-    const url = new URLSearchParams(window.location.search).get('url');
-    if (url) {
-      setTimeout(() => {
-        document.getElementById('loader').style.display = 'none';
-        iframe.style.display = 'block';
-        iframe.src = url;
-      }, 1500); // تأخير بسيط لعرض اللودر
+    if (vidURL) {
+      player.src = vidURL;
+      player.onload = () => document.getElementById("loader").style.display = "none";
     } else {
-      document.getElementById('loader').textContent = "❌ لم يتم العثور على رابط الفيديو.";
+      document.getElementById("loader").textContent = "❌ لم يتم العثور على رابط الفيديو.";
+    }
+
+    function skipIntro() {
+      player.contentWindow.postMessage({ action: 'seek', seconds: 85 }, '*');
+    }
+
+    function uploadSubtitle(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = btoa(unescape(encodeURIComponent(reader.result)));
+        player.contentWindow.postMessage({ action: 'loadSubtitle', base64, name: file.name }, '*');
+      };
+      reader.readAsText(file);
     }
   </script>
 </body>
