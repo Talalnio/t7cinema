@@ -1,65 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chillax Player</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>مشغل T7 السينمائي</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      background-color: #000;
-      height: 100%;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: radial-gradient(ellipse at center, #120012, #000);
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
       overflow: hidden;
     }
-    iframe {
-      border: none;
-      width: 100vw;
-      height: 100vh;
-    }
-    .loading-screen {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: radial-gradient(#1f0037, #000);
+    #loader {
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 9999;
-      flex-direction: column;
-      color: white;
-      font-family: sans-serif;
-      animation: fadeOut 1s ease-in-out 1 forwards;
-      animation-delay: 2s;
+      font-size: 22px;
+      font-weight: bold;
+      animation: blink 1.5s infinite;
     }
-    .loading-screen h1 {
-      font-size: 1.5rem;
-      margin-top: 1rem;
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
     }
-    @keyframes fadeOut {
-      to { opacity: 0; visibility: hidden; }
+    #player {
+      display: none;
+      flex: 1;
+      border: none;
+      width: 100%;
+      height: 100%;
     }
   </style>
-  <script>
-    // منع كل الإعلانات المنبثقة تماماً
-    window.open = () => null;
-    document.addEventListener('DOMContentLoaded', () => {
-      const query = new URLSearchParams(window.location.search);
-      const videoUrl = query.get('url');
-      if (!videoUrl) {
-        document.body.innerHTML = '<h1 style="color: white; text-align: center; margin-top: 50px;">❌ لا يوجد رابط تشغيل</h1>';
-        return;
-      }
-      const iframe = document.createElement('iframe');
-      iframe.src = videoUrl;
-      document.body.appendChild(iframe);
-    });
-  </script>
 </head>
 <body>
-  <div class="loading-screen">
-    <img src="https://media.tenor.com/1jTLEtWYOBMAAAAC/loading-bar.gif" width="90" />
-    <h1>جارٍ تجهيز المشغل السينمائي...</h1>
-  </div>
+  <div id="loader">...جارٍ تجهيز المشغل السينمائي</div>
+  <iframe id="player" allowfullscreen></iframe>
+
+  <script>
+    // ✅ منع جميع الإعلانات المنبثقة
+    window.open = function () {};
+    document.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') e.preventDefault();
+    }, true);
+
+    // ✅ منع أي نوافذ منبثقة داخل iframe
+    const iframe = document.getElementById('player');
+    const url = new URLSearchParams(window.location.search).get('url');
+    if (url) {
+      setTimeout(() => {
+        document.getElementById('loader').style.display = 'none';
+        iframe.style.display = 'block';
+        iframe.src = url;
+      }, 1500); // تأخير بسيط لعرض اللودر
+    } else {
+      document.getElementById('loader').textContent = "❌ لم يتم العثور على رابط الفيديو.";
+    }
+  </script>
 </body>
 </html>
