@@ -50,12 +50,6 @@
 <body>
   <div id="loader">...جارٍ تجهيز المشغل السينمائي</div>
 
-  <div id="controls">
-    <button onclick="skipIntro()">⏭ تخطي المقدمة</button>
-    <button onclick="document.getElementById('subtitleInput').click()">📄 رفع ترجمة</button>
-    <input type="file" id="subtitleInput" accept=".srt" onchange="uploadSubtitle(event)">
-  </div>
-
   <iframe id="vidoraPlayer"></iframe>
 
   <script>
