@@ -50,7 +50,11 @@
 <body>
   <div id="loader">...جارٍ تجهيز المشغل</div>
 
-  <iframe id="vidoraPlayer"></iframe>
+ <iframe
+  id="vidoraPlayer"
+  allowfullscreen
+  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-downloads allow-modals"
+></iframe>
 
   <script>
     // جلب رابط الفيديو من الباراميتر ?url=...
