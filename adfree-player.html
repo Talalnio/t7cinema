@@ -1,88 +1,44 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> T7 </title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>T7 Player</title>
   <style>
-    body {
+    html, body {
       margin: 0;
-      background-color: #000;
-      color: #fff;
-      font-family: 'Cairo', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    #loader {
-      position: absolute;
-      font-size: 1.5rem;
-      color: #ccc;
-      text-align: center;
+      padding: 0;
+      height: 100%;
+      background: #000;
     }
     iframe {
       width: 100vw;
       height: 100vh;
       border: none;
     }
-    #controls {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
-    }
-    #controls button {
-      background-color: #7456c8;
-      border: none;
-      color: white;
-      padding: 10px;
-      margin: 5px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    input[type="file"] {
-      display: none;
-    }
   </style>
 </head>
 <body>
-  <div id="loader">...جارٍ تجهيز المشغل</div>
-
-<iframe 
-  src="${embedURL}"
-  allowfullscreen
-  allow="fullscreen"
-  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-downloads allow-modals"
-></iframe>
+  <div id="loader" style="color:#ccc;text-align:center;padding:20px;">جارٍ تجهيز المشغل...</div>
+  <iframe
+    id="vidoraPlayer"
+    allowfullscreen
+    allow="fullscreen"
+    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-downloads allow-modals"
+  ></iframe>
 
   <script>
-    // جلب رابط الفيديو من الباراميتر ?url=...
     const params = new URLSearchParams(window.location.search);
     const vidURL = params.get("url");
     const player = document.getElementById("vidoraPlayer");
 
     if (vidURL) {
       player.src = vidURL;
-      player.onload = () => document.getElementById("loader").style.display = "none";
+      player.onload = () => {
+        document.getElementById("loader").style.display = "none";
+      };
     } else {
       document.getElementById("loader").textContent = "❌ لم يتم العثور على رابط الفيديو.";
-    }
-
-    function skipIntro() {
-      player.contentWindow.postMessage({ action: 'seek', seconds: 85 }, '*');
-    }
-
-    function uploadSubtitle(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64 = btoa(unescape(encodeURIComponent(reader.result)));
-        player.contentWindow.postMessage({ action: 'loadSubtitle', base64, name: file.name }, '*');
-      };
-      reader.readAsText(file);
     }
   </script>
 </body>
